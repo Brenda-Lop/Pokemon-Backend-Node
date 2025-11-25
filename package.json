@@ -18,7 +18,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma": "prisma",
+    "generate": "prisma generate"
   },
   "dependencies": {
     "@apollo/server": "^4.7.5",
@@ -27,6 +29,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/graphql": "^12.0.7",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/swagger": "^7.4.2",
     "@nestjs/typeorm": "^11.0.0",
     "@prisma/client": "^5.4.2",
     "class-transformer": "^0.5.1",
@@ -35,6 +38,7 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.7",
+    "swagger-ui-express": "^5.0.1",
     "ts-morph": "^19.0.0",
     "typeorm": "^0.3.21"
   },
