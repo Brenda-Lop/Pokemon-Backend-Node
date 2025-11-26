@@ -27,6 +27,15 @@ $ yarn prisma generate
 
 ```
 
+## (Optional) open prisma tables
+
+```bash
+$ npm run prisma studio
+or
+$ yarn prisma studio
+
+```
+
 ## Running the app
 
 ```bash
@@ -42,3 +51,30 @@ $ npm run test
 or
 $ yarn test
 ```
+
+## API Documentation
+
+This project includes built-in Swagger documentation (via NestJS) that allows you to explore and test all API endpoints directly from a web UI.
+All current endpoints and request properties are documented.
+
+To access the documentation:
+
+- Start the project
+- Open your browser at: http://localhost:4000/api
+
+## Unit Tests
+
+Basic unit tests were created for the controller, service and repository layers.
+
+## Future improvements
+
+#### API Documentation
+
+- Add full response schemas and standardized error models to Swagger for better clarity and client integration.
+
+- Document success/error examples for each endpoint.
+
+#### Tests
+
+- Add integration tests to validate end-to-end behavior across modules.
+- Add e2e tests to the controller layer to test routes and http response codes.
