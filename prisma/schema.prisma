@@ -8,18 +8,19 @@ datasource db {
 }
 
 model Pokemon {
-  id         Int           @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   name       String
-  type       String
-  created_at DateTime @default(now())
+  created_at DateTime     @default(now())
+  types      Type[]       @relation("PokemonTypes")
 
   @@map("pokemons")
 }
 
 model Type {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique
-  created_at DateTime @default(now())
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  created_at DateTime    @default(now())
+  pokemons   Pokemon[]   @relation("PokemonTypes")
 
   @@map("types")
 }

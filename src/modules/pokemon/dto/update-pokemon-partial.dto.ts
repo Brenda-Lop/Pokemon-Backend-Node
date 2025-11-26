@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { PokemonTypeValidation } from '../enum/pokemon-type.enum';
 import { Transform } from 'class-transformer';
@@ -12,15 +12,23 @@ export class UpdatePokemonPartialDto {
     @IsOptional()
     @IsString()
     @Transform(({ value }) => value.toLowerCase())
-    name?: string;
+    name?: string
 
     @ApiPropertyOptional({
         description: 'The type of the Pokémon',
         example: 'DRAGON',
         enum: Object.values(PokemonTypeValidation)
     })
+    @IsArray()
     @IsOptional()
-    @IsEnum(PokemonTypeValidation, { message: `type must be a valid Pokémon type: ${Object.values(PokemonTypeValidation)}` })
-    @Transform(({ value }) => value.toUpperCase())
-    type?: PokemonTypeValidation;
+    @IsEnum(PokemonTypeValidation, {
+        each: true,
+        message: `type must be a valid Pokémon type: ${Object.values(PokemonTypeValidation)}`
+    })
+    @Transform(({ value }) => // Follow the existing formatting for types (uppercase)
+        Array.isArray(value)
+            ? value.map(v => String(v).toUpperCase())
+            : [String(value).toUpperCase()]
+    )
+    types?: PokemonTypeValidation[]
 }

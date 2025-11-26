@@ -5,6 +5,7 @@ import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 import { Pokemon, Prisma } from '@prisma/client';
 import { UpdatePokemonPartialDto } from './dto/update-pokemon-partial.dto';
 import { ListPokemonQueryDto } from './dto/list-pokemon-query.dto';
+import { PokemonsResponseDto } from './dto/pokemon-response.dto';
 
 
 @Injectable()
@@ -14,7 +15,7 @@ export class PokemonRepository {
     ) { }
 
     // Retrieves all records applying filters from request
-    async findAll(query: ListPokemonQueryDto) {
+    async findAll(query: ListPokemonQueryDto): Promise<PokemonsResponseDto> {
 
         // Destructuring query params
         const { name, type, orderByDate, orderByName, createdFrom, page = 1, limit = 10 } = query
@@ -25,7 +26,7 @@ export class PokemonRepository {
 
         // Build where clause based on provided params
         if (name) where.name = { contains: name }
-        if (type) where.type = type
+        if (type) where.types = { some: { name: type } }
         if (createdFrom) where.created_at = { gte: new Date(createdFrom) }
 
         // Build orderBy clause based on provided params
@@ -43,6 +44,7 @@ export class PokemonRepository {
             orderBy,
             skip: (page - 1) * limit,
             take: limit,
+            include: { types: true },
         })
 
         // Response payload with pagination
@@ -63,19 +65,42 @@ export class PokemonRepository {
     }
 
     // Creates a new record
-    async create(data: CreatePokemonDto) {
+    async create(dto: CreatePokemonDto): Promise<Pokemon> {
+        const { types, ...pokemonData } = dto
+
         return this.prisma.pokemon.create({
-            data
+            data: {
+                ...pokemonData,
+                types: {
+                    connect: types.map(t => ({ name: t })),
+                },
+            },
+            include: { types: true },
         })
     }
 
     // Updates an existing record fully or partially
-    async update(id: number, data: UpdatePokemonDto | UpdatePokemonPartialDto): Promise<Pokemon> {
+    async update(id: number, dto: UpdatePokemonDto | UpdatePokemonPartialDto): Promise<Pokemon> {
         await this.ensureExists(id)
+
+        const { types, ...pokemonData } = dto
+
+        const data: Prisma.PokemonUpdateInput = {
+            ...pokemonData
+        }
+
+        if (types) {
+            data.types = {
+                set: [],
+                connect: types.map(t => ({ name: t }))
+            }
+        }
 
         return this.prisma.pokemon.update({
             where: { id },
-            data
+            data,
+            include: { types: true }
+
         })
     }
 
@@ -87,12 +112,13 @@ export class PokemonRepository {
     }
 
     // Private function that validates if the record exists and handles excepetion
-    private async ensureExists(id: number) {
-        const result = await this.prisma.pokemon.findUnique({ where: { id } })
+    private async ensureExists(id: number): Promise<Pokemon> {
+        const result = await this.prisma.pokemon.findUnique({ where: { id }, include: { types: true } })
 
         if (!result) {
             throw new NotFoundException(`Pokémon with id ${id} not found.`)
         }
+
         return result
     }
 }
