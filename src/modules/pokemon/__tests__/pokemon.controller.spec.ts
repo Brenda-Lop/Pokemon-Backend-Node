@@ -48,7 +48,7 @@ describe('PokemonController', () => {
     jest.clearAllMocks();
   });
 
-  describe('listAll', () => {
+  describe('findManyPokemon', () => {
     it('should return a paginated list of pokemons', async () => {
       const query: ListPokemonQueryDto = {};
       const result: PokemonsResponseDto = {
@@ -76,12 +76,12 @@ describe('PokemonController', () => {
 
       service.listAll.mockResolvedValue(result);
 
-      await expect(controller.listAll(query)).resolves.toEqual(result);
+      await expect(controller.findManyPokemon(query)).resolves.toEqual(result);
       expect(service.listAll).toHaveBeenCalledWith(query);
     });
   });
 
-  describe('findOne', () => {
+  describe('findOnePokemon', () => {
     it('should return a pokemon by id', async () => {
       const result: PokemonEntity = {
         id: 1,
@@ -90,19 +90,21 @@ describe('PokemonController', () => {
       };
       service.getById.mockResolvedValue(result as undefined);
 
-      await expect(controller.findOne(1)).resolves.toEqual(result);
+      await expect(controller.findOnePokemon(1)).resolves.toEqual(result);
       expect(service.getById).toHaveBeenCalledWith(1);
     });
 
     it('should throw NotFoundException when pokemon does not exist', async () => {
       service.getById.mockRejectedValue(new NotFoundException());
 
-      await expect(controller.findOne(999)).rejects.toThrow(NotFoundException);
+      await expect(controller.findOnePokemon(999)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(service.getById).toHaveBeenCalledWith(999);
     });
   });
 
-  describe('create', () => {
+  describe('createOnePokemon', () => {
     it('should create a new pokemon and return it', async () => {
       const dto: CreatePokemonDto = {
         name: 'pikachu',
@@ -118,12 +120,12 @@ describe('PokemonController', () => {
 
       service.create.mockResolvedValue(created as undefined);
 
-      await expect(controller.create(dto)).resolves.toEqual(created);
+      await expect(controller.createOnePokemon(dto)).resolves.toEqual(created);
       expect(service.create).toHaveBeenCalledWith(dto);
     });
   });
 
-  describe('update', () => {
+  describe('updateOnePokemon', () => {
     it('should update a pokemon and return it', async () => {
       const dto: UpdatePokemonDto = {
         name: 'raichu',
@@ -139,7 +141,9 @@ describe('PokemonController', () => {
 
       service.update.mockResolvedValue(updated as undefined);
 
-      await expect(controller.update(1, dto)).resolves.toEqual(updated);
+      await expect(controller.updateOnePokemon(1, dto)).resolves.toEqual(
+        updated,
+      );
       expect(service.update).toHaveBeenCalledWith(1, dto);
     });
 
@@ -148,21 +152,21 @@ describe('PokemonController', () => {
 
       service.update.mockRejectedValue(new NotFoundException());
 
-      await expect(controller.update(123, dto)).rejects.toThrow(
+      await expect(controller.updateOnePokemon(123, dto)).rejects.toThrow(
         NotFoundException,
       );
       expect(service.update).toHaveBeenCalledWith(123, dto);
     });
   });
 
-  describe('patch', () => {
+  describe('patchOnePokemon', () => {
     it('should partially update a pokemon and return it', async () => {
       const dto: UpdatePokemonPartialDto = { name: 'updated' } as undefined;
       const result: PokemonEntity = { id: 1, name: 'updated' };
 
       service.updatePartial.mockResolvedValue(result as undefined);
 
-      await expect(controller.patch(1, dto)).resolves.toEqual(result);
+      await expect(controller.patchOnePokemon(1, dto)).resolves.toEqual(result);
       expect(service.updatePartial).toHaveBeenCalledWith(1, dto);
     });
 
@@ -171,18 +175,18 @@ describe('PokemonController', () => {
 
       service.updatePartial.mockRejectedValue(new NotFoundException());
 
-      await expect(controller.patch(99, dto)).rejects.toThrow(
+      await expect(controller.patchOnePokemon(99, dto)).rejects.toThrow(
         NotFoundException,
       );
       expect(service.updatePartial).toHaveBeenCalledWith(99, dto);
     });
   });
 
-  describe('delete', () => {
+  describe('deleteOnePokemon', () => {
     it('should return void when deleting successfully', async () => {
       service.delete.mockResolvedValue(undefined);
 
-      const result = await controller.delete(1);
+      const result = await controller.deleteOnePokemon(1);
 
       expect(service.delete).toHaveBeenCalledWith(1);
       expect(result).toBeUndefined();
@@ -191,7 +195,9 @@ describe('PokemonController', () => {
     it('should throw NotFoundException when deleting a non-existing pokemon', async () => {
       service.delete.mockRejectedValue(new NotFoundException());
 
-      await expect(controller.delete(777)).rejects.toThrow(NotFoundException);
+      await expect(controller.deleteOnePokemon(777)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(service.delete).toHaveBeenCalledWith(777);
     });
   });

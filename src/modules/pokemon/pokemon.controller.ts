@@ -24,23 +24,23 @@ export class PokemonController {
   constructor(private readonly pokemonService: PokemonService) {}
 
   @Get()
-  async listAll(@Query() query: ListPokemonQueryDto) {
+  async findManyPokemon(@Query() query: ListPokemonQueryDto) {
     return this.pokemonService.listAll(query);
   }
 
   @Get('/:id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOnePokemon(@Param('id', ParseIntPipe) id: number) {
     return this.pokemonService.getById(id);
   }
 
   @Post()
   @HttpCode(201)
-  async create(@Body() dto: CreatePokemonDto) {
+  async createOnePokemon(@Body() dto: CreatePokemonDto) {
     return this.pokemonService.create(dto);
   }
 
   @Put(':id')
-  async update(
+  async updateOnePokemon(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdatePokemonDto,
   ) {
@@ -48,7 +48,7 @@ export class PokemonController {
   }
 
   @Patch(':id')
-  async patch(
+  async patchOnePokemon(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdatePokemonPartialDto,
   ) {
@@ -57,7 +57,7 @@ export class PokemonController {
 
   @Delete('/:id')
   @HttpCode(204)
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async deleteOnePokemon(@Param('id', ParseIntPipe) id: number) {
     await this.pokemonService.delete(id);
   }
 }

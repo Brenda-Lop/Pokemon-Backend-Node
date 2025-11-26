@@ -62,9 +62,75 @@ To access the documentation:
 - Start the project
 - Open your browser at: http://localhost:4000/api
 
+## Postman Collection
+
+[Download Pokemon API Collection](./postman/pokemon-api.postman_collection.json)
+
+## API Endpoints
+
+### Create Pokémon
+
+`POST /pokemons`
+
+Creates a new Pokémon.
+
+### List Pokémons
+
+`GET /pokemons`
+
+Returns all Pokémon with optional filtering, sorting and pagination.
+
+#### Available filters
+
+- name — filter by Pokémon name (partial match)
+
+- type — filter by Pokémon type
+
+- createdFrom — filter by minimum creation date
+
+#### Sorting options
+
+- orderByDate — sort by creation date (asc or desc)
+
+- orderByName — sort by name (asc or desc)
+
+#### Pagination
+
+- page — page number (default: 1)
+
+- limit — items per page (default: 10)
+
+### Get Pokémon by ID
+
+`GET /pokemons/:id`
+
+Fetches a single Pokémon.
+
+### Update Pokémon (full)
+
+`PUT /pokemons/:id`
+
+Replaces all fields of a Pokémon.
+
+### Update Pokémon (partial)
+
+`PATCH /pokemons/:id`
+
+Updates one or more fields of a Pokémon.
+
+### Delete Pokémon
+
+`DELETE /pokemons/:id`
+
+Deletes a Pokémon by ID.
+
 ## Unit Tests
 
 Basic unit tests were created for the controller, service and repository layers.
+
+## `pokemons` and `types` tables
+
+The type field from the `pokemons`table was converted into a many-to-many `types`table.
 
 ## Future improvements
 
