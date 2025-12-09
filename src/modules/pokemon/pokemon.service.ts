@@ -4,10 +4,14 @@ import { CreatePokemonDto } from './dto/create-pokemon.dto';
 import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 import { UpdatePokemonPartialDto } from './dto/update-pokemon-partial.dto';
 import { ListPokemonQueryDto } from './dto/list-pokemon-query.dto';
+import { PokeApiClient } from './api/pokeapi.client';
 
 @Injectable()
 export class PokemonService {
-  constructor(private pokemonRepository: PokemonRepository) {}
+  constructor(
+    private pokemonRepository: PokemonRepository,
+    private pokeApiClient: PokeApiClient,
+  ) {}
 
   async listAll(query: ListPokemonQueryDto) {
     return this.pokemonRepository.findAll(query);
@@ -31,5 +35,11 @@ export class PokemonService {
 
   async delete(id: number) {
     return this.pokemonRepository.delete(id);
+  }
+
+  // External API call
+  async importFromExternalApi(id: number) {
+    const data = await this.pokeApiClient.fetchPokemonById(id);
+    return this.pokemonRepository.upsertFromExternalApi(data);
   }
 }

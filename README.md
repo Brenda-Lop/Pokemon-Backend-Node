@@ -143,4 +143,5 @@ The type field from the `pokemons`table was converted into a many-to-many `types
 #### Tests
 
 - Add integration tests to validate end-to-end behavior across modules.
+
 - Add e2e tests to the controller layer to test routes and http response codes.

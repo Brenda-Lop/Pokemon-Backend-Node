@@ -5,7 +5,12 @@ import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 import { Pokemon, Prisma } from '@prisma/client';
 import { UpdatePokemonPartialDto } from './dto/update-pokemon-partial.dto';
 import { ListPokemonQueryDto } from './dto/list-pokemon-query.dto';
-import { PokemonsResponseDto } from './dto/pokemon-response.dto';
+import {
+  PokemonResponseDto,
+  PokemonsResponseDto,
+} from './dto/pokemon-response.dto';
+import { ImportPokemonDto } from './dto/import-pokemon.dto';
+import { ApiNotFoundError } from './api.errors';
 
 @Injectable()
 export class PokemonRepository {
@@ -43,7 +48,7 @@ export class PokemonRepository {
     const totalItems = await this.prisma.pokemon.count({ where });
 
     // Final query
-    const data = await this.prisma.pokemon.findMany({
+    const data: PokemonResponseDto[] = await this.prisma.pokemon.findMany({
       where,
       orderBy,
       skip: (page - 1) * limit,
@@ -117,17 +122,62 @@ export class PokemonRepository {
     await this.prisma.pokemon.delete({ where: { id } });
   }
 
+  // Creates or updates an imported pokemon by id
+  async upsertFromExternalApi(data: ImportPokemonDto): Promise<Pokemon> {
+    // Normalize names and types according to DB patterns before persistance
+    const types = data.types;
+    const normalizedName = data.name.toLowerCase();
+    const normalizedTypes = types.map((type) => type.toUpperCase());
+
+    // In case new types come from the external API,
+    // check whether they exist in DB or create a new one
+    const typeOps = normalizedTypes.map((type) => ({
+      where: { name: type },
+      create: { name: type },
+    }));
+
+    const existing = await this.prisma.pokemon.findUnique({
+      where: { id: data.id },
+      include: { types: true },
+    });
+
+    if (existing) {
+      return this.prisma.pokemon.update({
+        where: { id: data.id },
+        data: {
+          name: normalizedName,
+          types: {
+            set: [],
+            connectOrCreate: typeOps,
+          },
+        },
+        include: { types: true },
+      });
+    } else {
+      return this.prisma.pokemon.create({
+        data: {
+          id: data.id,
+          name: normalizedName,
+          types: {
+            connectOrCreate: typeOps,
+          },
+        },
+        include: { types: true },
+      });
+    }
+  }
+
   // Private function that validates if the record exists and handles excepetion
   private async ensureExists(id: number): Promise<Pokemon> {
-    const result = await this.prisma.pokemon.findUnique({
+    const pokemon = await this.prisma.pokemon.findUnique({
       where: { id },
       include: { types: true },
     });
 
-    if (!result) {
-      throw new NotFoundException(`Pokémon with id ${id} not found.`);
+    if (!pokemon) {
+      throw new ApiNotFoundError();
     }
 
-    return result;
+    return pokemon;
   }
 }
