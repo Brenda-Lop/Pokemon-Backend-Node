@@ -21,12 +21,23 @@ describe('PokeApiClient', () => {
   });
 
   it('should fetch pokemon by id', async () => {
-    const mockData = { id: 1, name: 'bulbasaur' };
+    const mockData = {
+      id: 1,
+      name: 'bulbasaur',
+      types: [{ type: { name: 'grass' } }],
+    };
+
+    const formattedData = {
+      id: 1,
+      name: 'bulbasaur',
+      types: ['grass'],
+    };
+
     mockHttp.axiosRef.get.mockResolvedValue({ data: mockData });
 
     const result = await client.fetchPokemonById(1);
 
-    expect(result).toEqual(mockData);
+    expect(result).toEqual(formattedData);
     expect(mockHttp.axiosRef.get).toHaveBeenCalledWith(
       'https://pokeapi.co/api/v2/pokemon/1',
     );

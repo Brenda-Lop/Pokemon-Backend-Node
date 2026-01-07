@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
 import {
   ExternalApiNotFoundError,
   ExternalApiRequestFailedError,
-} from 'src/common/external-api.errors';
+} from '../../../common/external-api.errors';
 
 @Injectable()
 export class PokeApiClient {
